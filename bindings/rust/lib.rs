@@ -10,14 +10,14 @@
 //! tree-sitter [Parser][], and then use the parser to parse some code:
 //!
 //! ```
-//! use tree_sitter::Parser;
+//! use tree_sitter_c2rust::Parser;
 //!
 //! let code = r#"
 //!     def double(x):
 //!         return x * 2
 //! "#;
 //! let mut parser = Parser::new();
-//! parser.set_language(tree_sitter_python::language()).expect("Error loading Python grammar");
+//! parser.set_language(tree_sitter_python_c2rust::language()).expect("Error loading Python grammar");
 //! let parsed = parser.parse(code, None);
 //! # let parsed = parsed.unwrap();
 //! # let root = parsed.root_node();
@@ -29,17 +29,19 @@
 //! [Parser]: https://docs.rs/tree-sitter/*/tree_sitter/struct.Parser.html
 //! [tree-sitter]: https://tree-sitter.github.io/
 
-use tree_sitter::Language;
+use tree_sitter_c2rust::Language;
 
-extern "C" {
-    fn tree_sitter_python() -> Language;
-}
+mod scanner;
+#[rustfmt::skip] mod parser;
+
 
 /// Returns the tree-sitter [Language][] for this grammar.
 ///
 /// [Language]: https://docs.rs/tree-sitter/*/tree_sitter/struct.Language.html
 pub fn language() -> Language {
-    unsafe { tree_sitter_python() }
+    unsafe {
+        std::mem::transmute::<*const parser::TSLanguage, Language>(parser::tree_sitter_python())
+    }
 }
 
 /// The source of the Python tree-sitter grammar description.
@@ -60,7 +62,7 @@ pub const TAGGING_QUERY: &'static str = include_str!("../../queries/tags.scm");
 mod tests {
     #[test]
     fn can_load_grammar() {
-        let mut parser = tree_sitter::Parser::new();
+        let mut parser = tree_sitter_c2rust::Parser::new();
         parser
             .set_language(super::language())
             .expect("Error loading Python grammar");

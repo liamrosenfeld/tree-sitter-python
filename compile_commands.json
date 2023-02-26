@@ -1,0 +1,19 @@
+[
+    {
+        "arguments": [
+            "cc",
+            "-c",
+            "-O3",
+            "-Wall",
+            "-Wextra",
+            "-Isrc",
+            "-std=gnu99",
+            "-fPIC",
+            "-o",
+            "src/parser.o",
+            "src/parser.c"
+        ],
+        "directory": "/Users/liam/Developer/tree-sitter-python-c2rust",
+        "file": "src/parser.c"
+    }
+]

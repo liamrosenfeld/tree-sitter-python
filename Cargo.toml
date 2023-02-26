@@ -1,19 +1,19 @@
 [package]
-name = "tree-sitter-python"
-description = "Python grammar for the tree-sitter parsing library"
+name = "tree-sitter-python-c2rust"
+description = "Python grammar for the tree-sitter parsing library in pure rust"
 version = "0.20.2"
 authors = [
     "Max Brunsfeld <maxbrunsfeld@gmail.com>",
     "Douglas Creager <dcreager@dcreager.net>",
+    "Liam Rosenfeld <me@liamrosenfeld.com>"
 ]
 license = "MIT"
 readme = "bindings/rust/README.md"
 keywords = ["incremental", "parsing", "python"]
 categories = ["parsing", "text-editors"]
 repository = "https://github.com/tree-sitter/tree-sitter-python"
-edition = "2018"
+edition = "2021"
 
-build = "bindings/rust/build.rs"
 include = [
   "bindings/rust/*",
   "grammar.js",
@@ -25,7 +25,5 @@ include = [
 path = "bindings/rust/lib.rs"
 
 [dependencies]
-tree-sitter = ">= 0.19, < 0.21"
-
-[build-dependencies]
-cc = "1.0"
+tree-sitter-c2rust = ">= 0.19, < 0.21"
+bytemuck = {version = "1.13", features = ["derive"]}
