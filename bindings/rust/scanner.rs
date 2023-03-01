@@ -1,9 +1,19 @@
 use bytemuck::{cast_slice, AnyBitPattern, NoUninit};
-use std::alloc::{alloc, dealloc, Layout};
 use std::cmp::min;
 use std::os::raw::{c_char, c_uint, c_void};
+use std::boxed::Box;
 
-use crate::parser::TSLexer;
+#[derive(Copy, Clone)]
+#[repr(C)]
+pub struct TSLexer {
+    pub lookahead: i32,
+    pub result_symbol: u16,
+    pub advance: Option<unsafe extern "C" fn(*mut TSLexer, bool) -> ()>,
+    pub mark_end: Option<unsafe extern "C" fn(*mut TSLexer) -> ()>,
+    pub get_column: Option<unsafe extern "C" fn(*mut TSLexer) -> i32>,
+    pub is_at_included_range_start: Option<unsafe extern "C" fn(*const TSLexer) -> bool>,
+    pub eof: Option<unsafe extern "C" fn(*const TSLexer) -> bool>,
+}
 
 #[repr(C)]
 struct ValidSymbols {
@@ -450,30 +460,29 @@ fn mark_end(lexer: &mut TSLexer) {
 }
 
 /* ======== Interface ======== */
+#[no_mangle]
 pub unsafe extern "C" fn tree_sitter_python_external_scanner_create() -> *mut c_void {
-    let layout = Layout::new::<Scanner>();
-    let ptr = alloc(layout) as *mut Scanner;
-    (*ptr) = Scanner::new();
-    ptr as *mut c_void
+    let scanner = Box::new(Scanner::new());
+    Box::into_raw(scanner) as *mut c_void
 }
 
+#[no_mangle]
 pub unsafe extern "C" fn tree_sitter_python_external_scanner_destroy(payload: *mut c_void) {
-    let layout = Layout::new::<Scanner>();
-    let ptr = payload as *mut u8;
-    dealloc(ptr, layout);
+    unsafe { Box::from_raw(payload as *mut Scanner) };
 }
 
+#[no_mangle]
 pub unsafe extern "C" fn tree_sitter_python_external_scanner_scan(
     payload: *mut c_void,
     lexer: *mut TSLexer,
     valid_symbols: *const bool,
 ) -> bool {
     let scanner = payload as *mut Scanner;
-    // let arr = std::slice::from_raw_parts(valid_symbols, 10);
     let valid_symbols = valid_symbols as *const ValidSymbols;
     (*scanner).scan(&mut *lexer, &*valid_symbols)
 }
 
+#[no_mangle]
 pub unsafe extern "C" fn tree_sitter_python_external_scanner_serialize(
     payload: *mut c_void,
     buffer: *mut c_char,
@@ -483,6 +492,7 @@ pub unsafe extern "C" fn tree_sitter_python_external_scanner_serialize(
     (*scanner).serialize(buffer) as c_uint
 }
 
+#[no_mangle]
 pub unsafe extern "C" fn tree_sitter_python_external_scanner_deserialize(
     payload: *mut c_void,
     buffer: *const c_char,

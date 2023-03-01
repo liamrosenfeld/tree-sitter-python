@@ -32,15 +32,17 @@
 use tree_sitter_c2rust::Language;
 
 mod scanner;
-#[rustfmt::skip] mod parser;
 
+extern "C" {
+    fn tree_sitter_python() -> Language;
+}
 
 /// Returns the tree-sitter [Language][] for this grammar.
 ///
 /// [Language]: https://docs.rs/tree-sitter/*/tree_sitter/struct.Language.html
 pub fn language() -> Language {
     unsafe {
-        std::mem::transmute::<*const parser::TSLanguage, Language>(parser::tree_sitter_python())
+        tree_sitter_python()
     }
 }
 

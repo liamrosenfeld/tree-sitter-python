@@ -1,0 +1,45 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug executable",
+            "cargo": {
+                "args": [
+                    "build",
+                    "--bin=tree-sitter-python-tests",
+                    "--package=tree-sitter-python-tests",
+                ],
+                "filter": {
+                    "name": "tree-sitter-python-tests",
+                    "kind": "bin"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug release executable",
+            "cargo": {
+                "args": [
+                    "build",
+                    "--bin=tree-sitter-python-tests",
+                    "--package=tree-sitter-python-tests",
+                    "--profile=release-with-debug"
+                ],
+                "filter": {
+                    "name": "tree-sitter-python-tests",
+                    "kind": "bin"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        }
+    ]
+}
