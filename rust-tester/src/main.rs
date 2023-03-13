@@ -2,7 +2,7 @@ mod tests;
 mod util;
 
 fn main() {
-    let language = tree_sitter_python_c2rust::language();
+    let language = tree_sitter_python_wasm_compatible::language();
     let corpus_dir = std::path::Path::new("../test/corpus");
     
     tests::run_tests_at_path(
