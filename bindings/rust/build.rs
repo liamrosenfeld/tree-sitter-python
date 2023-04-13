@@ -4,11 +4,11 @@ extern crate cc;
 fn main() {
     let src_dir = Path::new("src");
     let parser_path = src_dir.join("parser.c");
-    let sysroot_dir = Path::new("wasm-sysroot");
-
     let mut compiler = cc::Build::new();
 
+    // set minimal C sysroot if wasm32-unknown-unknown
     if std::env::var("TARGET").unwrap() == "wasm32-unknown-unknown" {
+        let sysroot_dir = Path::new("bindings/rust/wasm-sysroot");
         compiler
             .archiver("llvm-ar")
             .include(&sysroot_dir);

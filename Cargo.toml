@@ -1,11 +1,10 @@
 [package]
-name = "tree-sitter-python-wasm-compatible"
+name = "tree-sitter-python"
 description = "Python grammar for the tree-sitter parsing library in pure rust"
 version = "0.20.2"
 authors = [
     "Max Brunsfeld <maxbrunsfeld@gmail.com>",
     "Douglas Creager <dcreager@dcreager.net>",
-    "Liam Rosenfeld <me@liamrosenfeld.com>"
 ]
 license = "MIT"
 readme = "bindings/rust/README.md"
@@ -27,8 +26,14 @@ build = "bindings/rust/build.rs"
 path = "bindings/rust/lib.rs"
 
 [dependencies]
-tree-sitter-c2rust = { git = "https://github.com/shadaj/tree-sitter-c2rust/" }
-bytemuck = {version = "1.13", features = ["derive"]}
+tree-sitter = { version = ">= 0.19, < 0.21", optional = true }
+tree-sitter-c2rust = { version = ">= 0.19, < 0.21", optional = true }
+bytemuck = { version = "1.13", features = ["derive"] }
 
 [build-dependencies]
 cc = "1.0"
+
+[features]
+default = ["native"]
+native = ["dep:tree-sitter"]
+wasm = ["dep:tree-sitter-c2rust"]
