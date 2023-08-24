@@ -42,6 +42,10 @@ use tree_sitter::Language;
 #[cfg(feature = "wasm")]
 use tree_sitter_c2rust::Language;
 
+// provide rust allocation functions to C if on wasm
+#[cfg(target_arch = "wasm32")]
+mod c_alloc;
+
 extern "C" {
     fn tree_sitter_python() -> Language;
 }
