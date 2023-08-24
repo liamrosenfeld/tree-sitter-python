@@ -1,7 +1,15 @@
 fn main() {
     let src_dir = std::path::Path::new("src");
-
     let mut c_config = cc::Build::new();
+
+    // set minimal C sysroot if wasm32-unknown-unknown
+    if std::env::var("TARGET").unwrap() == "wasm32-unknown-unknown" {
+        let sysroot_dir = std::path::Path::new("bindings/rust/wasm-sysroot");
+        c_config
+            .archiver("llvm-ar")
+            .include(&sysroot_dir);
+    }
+
     c_config.include(src_dir);
     c_config
         .flag_if_supported("-Wno-unused-parameter")

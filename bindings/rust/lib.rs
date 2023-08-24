@@ -10,7 +10,11 @@
 //! tree-sitter [Parser][], and then use the parser to parse some code:
 //!
 //! ```
+//! #[cfg(feature = "native")]
 //! use tree_sitter::Parser;
+//!
+//! #[cfg(feature = "wasm")]
+//! use tree_sitter_c2rust::Parser;
 //!
 //! let code = r#"
 //!     def double(x):
@@ -29,7 +33,14 @@
 //! [Parser]: https://docs.rs/tree-sitter/*/tree_sitter/struct.Parser.html
 //! [tree-sitter]: https://tree-sitter.github.io/
 
+#[cfg(all(feature = "native", feature = "wasm"))]
+compile_error!("feature \"native\" and feature \"wasm\" cannot be enabled at the same time");
+
+#[cfg(feature = "native")]
 use tree_sitter::Language;
+
+#[cfg(feature = "wasm")]
+use tree_sitter_c2rust::Language;
 
 extern "C" {
     fn tree_sitter_python() -> Language;
@@ -58,9 +69,15 @@ pub const TAGGING_QUERY: &str = include_str!("../../queries/tags.scm");
 
 #[cfg(test)]
 mod tests {
+    #[cfg(feature = "native")]
+    use tree_sitter::Parser;
+
+    #[cfg(feature = "wasm")]
+    use tree_sitter_c2rust::Parser;
+
     #[test]
     fn can_load_grammar() {
-        let mut parser = tree_sitter::Parser::new();
+        let mut parser = Parser::new();
         parser
             .set_language(super::language())
             .expect("Error loading Python grammar");
